@@ -20,12 +20,9 @@ public class MdcSettingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        try{
-            MDC.put("request-id", request.getRequestURI());
-            MDC.put("session-id", request.getSession().getId());
+        try(MDC.MDCCloseable rid = MDC.putCloseable("rid", request.getRequestURI());
+            MDC.MDCCloseable sid = MDC.putCloseable("sid", request.getRequestedSessionId())){
             filterChain.doFilter(servletRequest, servletResponse);
-        } finally {
-            MDC.clear();
         }
     }
 }
